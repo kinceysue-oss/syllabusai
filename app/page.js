@@ -28,12 +28,18 @@ export default function Home() {
     formData.append('file', file);
 
     const res = await fetch('/api/extract', {
-      method: 'POST',
-      body: formData,
-    });
-    const data = await res.json();
-    setResponse(data);
-    setLoading(false);
+  method: 'POST',
+  body: formData,
+});
+const text = await res.text();
+console.log('Raw response:', text);
+try {
+  const data = JSON.parse(text);
+  setResponse(data);
+} catch(e) {
+  setResponse({ error: 'Parse failed', raw: text });
+}
+setLoading(false);
   }
 
   return (
