@@ -79,12 +79,48 @@ setLoading(false);
           </button>
         )}
 
-        {response && (
-          <div className="mt-6 bg-white border border-gray-200 rounded-xl p-4">
-            <p className="text-sm text-gray-500">Server response:</p>
-            <pre className="text-sm text-gray-800 mt-1">{JSON.stringify(response, null, 2)}</pre>
-          </div>
-        )}
+        {response && !response.error && (
+  <div className="mt-6">
+    <h2 className="text-xl font-bold text-gray-900 mb-1">{response.course_name}</h2>
+    <p className="text-sm text-gray-500 mb-4">{response.items.length} items found</p>
+    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <table className="w-full text-sm">
+        <thead className="bg-gray-50 border-b border-gray-200">
+          <tr>
+            <th className="text-left p-3 font-medium text-gray-600">Name</th>
+            <th className="text-left p-3 font-medium text-gray-600">Type</th>
+            <th className="text-left p-3 font-medium text-gray-600">Due Date</th>
+            <th className="text-left p-3 font-medium text-gray-600">Weight</th>
+          </tr>
+        </thead>
+        <tbody>
+          {response.items.map((item, i) => (
+            <tr key={i} className="border-b border-gray-100 last:border-0">
+              <td className="p-3 text-gray-900 font-medium">{item.name}</td>
+              <td className="p-3">
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                  item.type === 'exam' ? 'bg-red-100 text-red-700' :
+                  item.type === 'quiz' ? 'bg-amber-100 text-amber-700' :
+                  'bg-blue-100 text-blue-700'
+                }`}>
+                  {item.type}
+                </span>
+              </td>
+              <td className="p-3 text-gray-600">{item.due_date || '—'}</td>
+              <td className="p-3 text-gray-600">{item.weight_pct ? `${item.weight_pct}%` : '—'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+)}
+
+{response && response.error && (
+  <div className="mt-6 bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
+    Something went wrong. Try uploading again.
+  </div>
+)}
       </div>
     </main>
   );
