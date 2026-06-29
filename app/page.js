@@ -4,6 +4,8 @@ import { useState } from 'react';
 export default function Home() {
   const [file, setFile] = useState(null);
   const [dragging, setDragging] = useState(false);
+  const [response, setResponse] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   function handleDrop(e) {
     e.preventDefault();
@@ -17,6 +19,21 @@ export default function Home() {
   function handleFileInput(e) {
     const selected = e.target.files[0];
     if (selected) setFile(selected);
+  }
+
+  async function handleUpload() {
+    if (!file) return;
+    setLoading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const res = await fetch('/api/extract', {
+      method: 'POST',
+      body: formData,
+    });
+    const data = await res.json();
+    setResponse(data);
+    setLoading(false);
   }
 
   return (
@@ -45,6 +62,23 @@ export default function Home() {
             </>
           )}
         </div>
+
+        {file && (
+          <button
+            onClick={handleUpload}
+            disabled={loading}
+            className="mt-4 w-full bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
+          >
+            {loading ? 'Uploading...' : 'Upload Syllabus'}
+          </button>
+        )}
+
+        {response && (
+          <div className="mt-6 bg-white border border-gray-200 rounded-xl p-4">
+            <p className="text-sm text-gray-500">Server response:</p>
+            <pre className="text-sm text-gray-800 mt-1">{JSON.stringify(response, null, 2)}</pre>
+          </div>
+        )}
       </div>
     </main>
   );
