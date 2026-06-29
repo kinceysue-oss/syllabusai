@@ -82,36 +82,82 @@ setLoading(false);
         {response && !response.error && (
   <div className="mt-6">
     <h2 className="text-xl font-bold text-gray-900 mb-1">{response.course_name}</h2>
-    <p className="text-sm text-gray-500 mb-4">{response.items.length} items found</p>
-    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-      <table className="w-full text-sm">
-        <thead className="bg-gray-50 border-b border-gray-200">
-          <tr>
-            <th className="text-left p-3 font-medium text-gray-600">Name</th>
-            <th className="text-left p-3 font-medium text-gray-600">Type</th>
-            <th className="text-left p-3 font-medium text-gray-600">Due Date</th>
-            <th className="text-left p-3 font-medium text-gray-600">Weight</th>
-          </tr>
-        </thead>
-        <tbody>
-          {response.items.map((item, i) => (
-            <tr key={i} className="border-b border-gray-100 last:border-0">
-              <td className="p-3 text-gray-900 font-medium">{item.name}</td>
-              <td className="p-3">
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+    <p className="text-sm text-gray-500 mb-6">{response.items.length} items found</p>
+
+    <div className="relative">
+      <div className="absolute left-3 top-0 bottom-0 w-px bg-gray-200"></div>
+
+      {response.items
+        .filter(item => item.due_date)
+        .sort((a, b) => new Date(a.due_date) - new Date(b.due_date))
+        .map((item, i) => (
+          <div key={i} className="relative flex gap-4 mb-6 pl-10">
+            <div className={`absolute left-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
+              item.type === 'exam' ? 'bg-red-100 text-red-700' :
+              item.type === 'quiz' ? 'bg-amber-100 text-amber-700' :
+              'bg-blue-100 text-blue-700'
+            }`}>
+              {item.type === 'exam' ? 'E' : item.type === 'quiz' ? 'Q' : 'A'}
+            </div>
+
+            <div className="bg-white border border-gray-200 rounded-xl p-4 flex-1">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="font-medium text-gray-900">{item.name}</p>
+                  <p className="text-sm text-gray-500 mt-1">{item.due_date}</p>
+                </div>
+                <div className="flex flex-col items-end gap-1">
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    item.type === 'exam' ? 'bg-red-100 text-red-700' :
+                    item.type === 'quiz' ? 'bg-amber-100 text-amber-700' :
+                    'bg-blue-100 text-blue-700'
+                  }`}>
+                    {item.type}
+                  </span>
+                  {item.weight_pct && (
+                    <span className="text-xs text-gray-400">{item.weight_pct}%</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+
+      {response.items.filter(item => !item.due_date).length > 0 && (
+        <div className="pl-10 mt-2">
+          <p className="text-sm text-gray-400 mb-3">No specific due date</p>
+          {response.items
+            .filter(item => !item.due_date)
+            .map((item, i) => (
+              <div key={i} className="relative flex gap-4 mb-4">
+                <div className={`absolute left-[-40px] w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
                   item.type === 'exam' ? 'bg-red-100 text-red-700' :
                   item.type === 'quiz' ? 'bg-amber-100 text-amber-700' :
                   'bg-blue-100 text-blue-700'
                 }`}>
-                  {item.type}
-                </span>
-              </td>
-              <td className="p-3 text-gray-600">{item.due_date || '—'}</td>
-              <td className="p-3 text-gray-600">{item.weight_pct ? `${item.weight_pct}%` : '—'}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                  {item.type === 'exam' ? 'E' : item.type === 'quiz' ? 'Q' : 'A'}
+                </div>
+                <div className="bg-white border border-gray-200 rounded-xl p-4 flex-1">
+                  <div className="flex items-start justify-between gap-4">
+                    <p className="font-medium text-gray-900">{item.name}</p>
+                    <div className="flex flex-col items-end gap-1">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        item.type === 'exam' ? 'bg-red-100 text-red-700' :
+                        item.type === 'quiz' ? 'bg-amber-100 text-amber-700' :
+                        'bg-blue-100 text-blue-700'
+                      }`}>
+                        {item.type}
+                      </span>
+                      {item.weight_pct && (
+                        <span className="text-xs text-gray-400">{item.weight_pct}%</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+        </div>
+      )}
     </div>
   </div>
 )}
